@@ -38,8 +38,26 @@
 
   async function boot() {
     const msg = $('#gateMsg');
+    let ready = null;
+    $('#gateForm').addEventListener('submit', async ev => {
+      ev.preventDefault();
+      const pass = $('#pw').value.trim();
+      if (!pass || !ready) return;
+      $('#go').disabled = true; msg.textContent = '驗證中…';
+      try {
+        if (!(await ready)) { $('#go').disabled = false; return; }
+        const key = await deriveKey(pass);
+        if (!(await checkKey(key))) { msg.textContent = '密語不正確。'; $('#go').disabled = false; return; }
+        if ($('#remember').checked) { try { localStorage.setItem(KEY_STORE, b64enc(new Uint8Array(await crypto.subtle.exportKey('raw', key)))); } catch (e) { /* ignore */ } }
+        await enter(key);
+      } catch (e) { msg.textContent = '解密失敗：' + e.message; $('#go').disabled = false; }
+    });
     if (!(window.crypto && crypto.subtle && window.DecompressionStream)) { msg.textContent = '瀏覽器過舊或非 https，無法解密。'; return; }
-    try { meta = await (await fetch('data/meta.json', { cache: 'no-cache' })).json(); } catch (e) { msg.textContent = '讀不到加密參數，請重新整理。'; return; }
+    ready = (async () => {
+      try { meta = await (await fetch('data/meta.json', { cache: 'no-cache' })).json(); return true; }
+      catch (e) { msg.textContent = '讀不到加密參數，請重新整理。'; return false; }
+    })();
+    if (!(await ready)) return;
     let stored = null;
     try { stored = localStorage.getItem(KEY_STORE); } catch (e) { /* ignore */ }
     if (stored) {
@@ -49,18 +67,6 @@
       } catch (e) { /* fall through */ }
       try { localStorage.removeItem(KEY_STORE); } catch (e) { /* ignore */ }
     }
-    $('#gateForm').addEventListener('submit', async ev => {
-      ev.preventDefault();
-      const pass = $('#pw').value.trim();
-      if (!pass) return;
-      $('#go').disabled = true; msg.textContent = '驗證中…';
-      try {
-        const key = await deriveKey(pass);
-        if (!(await checkKey(key))) { msg.textContent = '密語不正確。'; $('#go').disabled = false; return; }
-        if ($('#remember').checked) { try { localStorage.setItem(KEY_STORE, b64enc(new Uint8Array(await crypto.subtle.exportKey('raw', key)))); } catch (e) { /* ignore */ } }
-        await enter(key);
-      } catch (e) { msg.textContent = '解密失敗：' + e.message; $('#go').disabled = false; }
-    });
   }
   async function enter(key) {
     DB = await loadDb(key);
