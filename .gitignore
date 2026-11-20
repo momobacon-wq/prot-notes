@@ -1,0 +1,5 @@
+*.plain.json
+_plain/
+__pycache__/
+*.key
+node_modules/

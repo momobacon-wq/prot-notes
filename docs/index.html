@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<title>查閱站</title>
+<link rel="stylesheet" href="app.css?v=4">
+</head>
+<body>
+<div id="gate" class="gate">
+  <form id="gateForm" class="gate-card" autocomplete="off">
+    <h1>查閱站</h1>
+    <p class="muted">內容已加密，請輸入密語。</p>
+    <input id="pw" type="password" placeholder="密語" autocomplete="current-password" autofocus>
+    <label class="chk"><input id="remember" type="checkbox"> 記住此裝置</label>
+    <button type="submit" id="go">解鎖</button>
+    <p id="gateMsg" class="err" role="alert"></p>
+  </form>
+</div>
+<div id="app" hidden>
+  <header class="top">
+    <div class="top-row">
+      <h1 id="title"></h1>
+      <div class="top-actions">
+        <button id="themeBtn" type="button" title="深色／淺色">◐</button>
+        <button id="lockBtn" type="button" title="登出並清除記住的金鑰">登出</button>
+      </div>
+    </div>
+    <nav id="tabs" class="tabs"></nav>
+  </header>
+  <main id="view"></main>
+  <footer id="foot" class="foot"></footer>
+</div>
+<div id="drawer" class="drawer" hidden><div class="drawer-bg"></div><aside class="drawer-panel" role="dialog" aria-modal="true"><button class="drawer-x" type="button" aria-label="關閉">✕</button><div id="drawerBody"></div></aside></div>
+<script src="app.js?v=4"></script>
+</body>
+</html>
